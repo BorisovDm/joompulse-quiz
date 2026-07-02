@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Guess the Supplier Price 🇧🇷</title>
+<title>Guess the Category Tree 🇧🇷</title>
 <style>
   :root {
     --bg: #10141f;
@@ -29,10 +29,9 @@
   }
   h1 { font-size: 26px; margin-bottom: 4px; text-align: center; }
   .subtitle { color: var(--muted); margin-bottom: 28px; text-align: center; font-size: 14px; }
-  .screen { width: 100%; max-width: 860px; }
+  .screen { width: 100%; max-width: 720px; }
   .hidden { display: none !important; }
 
-  /* ---- start screen ---- */
   .panel {
     background: var(--card);
     border-radius: var(--radius);
@@ -55,50 +54,50 @@
     transition: transform .1s;
   }
   .btn:hover { transform: scale(1.04); }
-  .btn:disabled { opacity: .4; cursor: default; transform: none; }
   .btn.secondary { background: var(--card2); color: var(--text); }
 
-  /* ---- game screen ---- */
   .progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 14px; color: var(--muted); }
   .progress .score { color: var(--accent); font-weight: 700; }
   .bar { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
   .bar div { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
 
-  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
-  .card {
-    background: var(--card); border-radius: var(--radius); overflow: hidden;
-    display: flex; flex-direction: column;
+  .product {
+    background: var(--card); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 16px; padding: 14px 18px;
   }
-  .card .tag {
-    font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    padding: 10px 16px;
+  .product img {
+    width: 110px; height: 110px; object-fit: contain; background: #fff; border-radius: 10px; flex-shrink: 0;
   }
-  .card.mlb .tag { background: #ffe600; color: #1a1a00; }
-  .card.supplier .tag { background: #34d399; color: #04150d; }
-  .card img {
-    width: 100%; height: 260px; object-fit: contain; background: #fff;
+  .product .title { font-size: 15px; line-height: 1.4; text-align: left; }
+  @media (max-width: 520px) {
+    .product { flex-direction: column; }
+    .product .title { text-align: center; }
   }
-  .card .body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-  .card .title { font-size: 15px; line-height: 1.35; }
-  .card .cat { font-size: 12.5px; color: var(--muted); }
-  .card .price { margin-top: auto; font-size: 22px; font-weight: 800; }
-  .card.mlb .price { color: var(--accent); }
-  .card.supplier .price { color: var(--green); }
-  .price.mystery { color: var(--muted); letter-spacing: .1em; }
 
-  .guess-row {
-    display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;
-  }
-  .guess-input {
-    background: var(--card2); border: 2px solid #37415f; border-radius: 12px;
-    color: var(--text); font-size: 20px; font-weight: 700; padding: 12px 16px;
-    width: 200px; text-align: right;
-  }
-  .guess-input:focus { outline: none; border-color: var(--accent); }
-  .hint { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px; }
+  .level-label { color: var(--muted); }
+  .lives { font-size: 17px; letter-spacing: 2px; }
 
-  /* ---- feedback ---- */
+  .breadcrumb {
+    background: var(--card2); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;
+    font-size: 14px; line-height: 1.6; text-align: left; color: var(--muted);
+  }
+  .breadcrumb b { color: var(--green); font-weight: 600; }
+  .breadcrumb .sep { color: var(--muted); margin: 0 4px; }
+  .breadcrumb .next-q { color: var(--accent); font-weight: 700; }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 520px) { .options { grid-template-columns: 1fr; } }
+  .options button {
+    background: var(--card); color: var(--text); border: 2px solid #37415f; border-radius: 12px;
+    padding: 14px 16px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center;
+    transition: .15s; line-height: 1.35;
+  }
+  .options button:hover:not(:disabled) { border-color: var(--accent); }
+  .options button:disabled { cursor: default; }
+  .options button.correct { border-color: var(--green); background: rgba(52,211,153,.15); color: var(--green); }
+  .options button.wrong { border-color: var(--red); background: rgba(248,113,113,.12); color: var(--red); opacity: .8; }
+
   .feedback {
     margin-top: 18px; border-radius: var(--radius); padding: 20px 24px; text-align: center;
   }
@@ -107,11 +106,10 @@
   .feedback .verdict { font-size: 21px; font-weight: 800; margin-bottom: 6px; }
   .feedback.ok .verdict { color: var(--green); }
   .feedback.bad .verdict { color: var(--red); }
-  .feedback .detail { color: var(--muted); font-size: 14.5px; line-height: 1.5; margin-bottom: 14px; }
+  .feedback .detail { color: var(--muted); font-size: 14.5px; line-height: 1.6; margin-bottom: 14px; }
   .feedback .detail b { color: var(--text); }
   .feedback a { color: var(--accent); }
 
-  /* ---- result screen ---- */
   .result-emoji { font-size: 64px; margin-bottom: 10px; }
   .result-score { font-size: 20px; color: var(--muted); margin-bottom: 6px; }
   .result-score b { color: var(--text); font-size: 26px; }
@@ -141,14 +139,15 @@
 </head>
 <body>
 
-<h1>🇧🇷 Guess the Supplier Price</h1>
-<div class="subtitle">On the left — a product on Mercado Livre with its price. On the right — the same product from a local supplier. How much does it cost?</div>
+<h1>🇧🇷 Guess the Category Tree</h1>
+<div class="subtitle">You see a product from Mercado Livre. Guess its full category path, level by level.</div>
 
 <!-- START -->
 <div id="screen-start" class="screen">
   <div class="panel">
-    <p>You'll see a product from Mercado Livre and its match from a local Brazilian supplier.<br>
-    Guess the supplier's price — landing within <b style="color:var(--text)">±25%</b> of the real price counts as a hit.</p>
+    <p>At each level you pick one of 4 categories — only one is correct.<br>
+    Guess the whole path from the top category down to the leaf.<br>
+    You have <b style="color:var(--text)">3 lives ❤️</b> per product — each wrong answer costs one.</p>
     <div class="rounds-label">How many rounds?</div>
     <div class="rounds" id="rounds">
       <button data-n="5">5</button>
@@ -156,46 +155,31 @@
       <button data-n="10">10</button>
     </div>
     <button class="btn" id="btn-start">Start game</button>
-    <p style="margin: 20px 0 0; font-size: 13px;">More games: <a href="categories/" style="color: var(--accent);">Guess the Category Tree →</a></p>
+    <p style="margin: 20px 0 0; font-size: 13px;">More games: <a href="../" style="color: var(--accent);">Guess the Supplier Price →</a></p>
   </div>
 </div>
 
 <!-- GAME -->
 <div id="screen-game" class="screen hidden">
   <div class="progress">
-    <span id="round-label">Round 1 / 5</span>
+    <span id="round-label">Round 1 / 7</span>
     <span class="score" id="score-label">Score: 0</span>
   </div>
   <div class="bar"><div id="bar-fill"></div></div>
 
-  <div class="cards">
-    <div class="card mlb">
-      <div class="tag">Mercado Livre</div>
-      <img id="mlb-img" alt="" referrerpolicy="no-referrer">
-      <div class="body">
-        <div class="title" id="mlb-title"></div>
-        <div class="cat" id="mlb-cat"></div>
-        <div class="price" id="mlb-price"></div>
-      </div>
-    </div>
-    <div class="card supplier">
-      <div class="tag">Local Supplier</div>
-      <img id="sup-img" alt="" referrerpolicy="no-referrer">
-      <div class="body">
-        <div class="title" id="sup-title"></div>
-        <div class="cat">&nbsp;</div>
-        <div class="price mystery" id="sup-price">R$ ???</div>
-      </div>
-    </div>
+  <div class="product">
+    <img id="prod-img" alt="" referrerpolicy="no-referrer">
+    <div class="title" id="prod-title"></div>
   </div>
 
-  <div id="guess-block">
-    <div class="guess-row">
-      <input class="guess-input" id="guess" inputmode="decimal" placeholder="R$ 0,00" autocomplete="off">
-      <button class="btn" id="btn-guess">Guess</button>
-    </div>
-    <div class="hint">Enter the price in Brazilian reais (R$). Within ±25% counts as a hit.</div>
+  <div class="status-row">
+    <span class="level-label" id="level-label">Level 1 of 3</span>
+    <span class="lives" id="lives">❤️❤️❤️</span>
   </div>
+
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <div class="options" id="options"></div>
 
   <div id="feedback" class="feedback hidden">
     <div class="verdict" id="fb-verdict"></div>
@@ -208,7 +192,7 @@
 <div id="screen-result" class="screen hidden">
   <div class="panel">
     <div class="result-emoji" id="res-emoji"></div>
-    <div class="result-score">Correct guesses: <b id="res-score"></b></div>
+    <div class="result-score">Products completed: <b id="res-score"></b></div>
     <div class="result-title" id="res-title"></div>
     <div class="result-desc" id="res-desc"></div>
     <div class="result-table-wrap">
@@ -224,35 +208,33 @@
 <script>
 const DATA = __DATA__;
 
-const SUPPLIER_IMG_PREFIX = "https://files.joomprocdn.net/";
-const PRODUCT_LINK = "https://joompulse.com/en/dashboard/local-suppliers/product/";
-const TOLERANCE = 0.25;
+const PRODUCT_LINK = "https://joompulse.com/en/dashboard/beginner-products/";
+const MAX_MISTAKES = 3;
 
 const RATINGS = [
   { min: 0.00, emoji: "🏖️", title: "Gringo",
-    desc: "They can spot you from a mile away: you pay like a tourist on Copacabana. The local market is still a mystery to you." },
-  { min: 0.21, emoji: "🎒", title: "Tourist on 25 de Março Street",
-    desc: "You've heard something about wholesale prices, but haggling still scares you." },
-  { min: 0.41, emoji: "🛵", title: "Junior Buyer",
-    desc: "You've got a feel for the market, but suppliers still overcharge you now and then." },
-  { min: 0.61, emoji: "🤝", title: "Seasoned Negotiator",
-    desc: "Suppliers take you seriously. You know where the margin is — and where the rip-off is." },
-  { min: 0.81, emoji: "🧠", title: "Local Market Pro",
-    desc: "You read supplier prices like an open book. Impressive!" },
-  { min: 0.999, emoji: "👑", title: "King of the Local Market",
-    desc: "A perfect score! Suppliers whisper your name in the warehouses of São Paulo." },
+    desc: "You wandered into the catalog and got lost immediately. Categories are still a jungle to you." },
+  { min: 0.21, emoji: "🧭", title: "Window Shopper",
+    desc: "You know the big departments, but the deeper levels swallow you whole." },
+  { min: 0.41, emoji: "📦", title: "Catalog Intern",
+    desc: "You find your way around, though the leaf categories still play tricks on you." },
+  { min: 0.61, emoji: "🗂️", title: "Category Curator",
+    desc: "Solid navigation! You could almost file products for a living." },
+  { min: 0.81, emoji: "🧠", title: "Taxonomy Pro",
+    desc: "You walk the category tree like it's your own backyard. Impressive!" },
+  { min: 0.999, emoji: "👑", title: "Master of the Catalog",
+    desc: "A perfect run! Mercado Livre should hire you to organize their tree." },
 ];
 
 let totalRounds = 7;
 let round = 0, score = 0;
 let items = [];
-let current = null;
+let current = null;   // { id, t, img, path: [{n, w}] }
+let levelIdx = 0, mistakes = 0;
 let history = [];
 
 const $ = id => document.getElementById(id);
-const fmt = v => "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// rounds selector
 document.querySelectorAll("#rounds button").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("#rounds button").forEach(x => x.classList.remove("active"));
@@ -286,57 +268,72 @@ function nextRound() {
   if (round >= totalRounds) return endGame();
   current = items[round];
   round++;
+  levelIdx = 0; mistakes = 0;
 
   $("round-label").textContent = `Round ${round} / ${totalRounds}`;
   $("score-label").textContent = `Score: ${score}`;
   $("bar-fill").style.width = ((round - 1) / totalRounds * 100) + "%";
 
-  $("mlb-img").src = current.mi;
-  $("mlb-title").textContent = current.mt;
-  $("mlb-cat").textContent = current.c;
-  $("mlb-price").textContent = fmt(current.mp);
+  $("prod-img").src = current.img;
+  $("prod-title").textContent = current.t;
 
-  $("sup-img").src = SUPPLIER_IMG_PREFIX + current.si;
-  $("sup-title").textContent = current.st;
-  $("sup-price").textContent = "R$ ???";
-  $("sup-price").classList.add("mystery");
-
-  $("guess").value = "";
-  $("guess-block").classList.remove("hidden");
   $("feedback").classList.add("hidden");
-  $("guess").focus();
+  renderLevel();
 }
 
-function parsePrice(raw) {
-  let s = raw.trim().replace(/[R$\s]/gi, "");
-  const lastDot = s.lastIndexOf("."), lastComma = s.lastIndexOf(",");
-  if (lastDot !== -1 && lastComma !== -1) {
-    // both separators present: the last one is decimal, the rest are thousands
-    const dec = Math.max(lastDot, lastComma);
-    s = s.slice(0, dec).replace(/[.,]/g, "") + "." + s.slice(dec + 1);
-  } else if (lastDot !== -1 || lastComma !== -1) {
-    const pos = Math.max(lastDot, lastComma);
-    const sep = s[pos];
-    const repeated = s.split(sep).length - 1 > 1;
-    // exactly 3 digits after a single separator means thousands (1.200 / 1,200)
-    if (repeated || s.length - pos - 1 === 3) s = s.replace(/[.,]/g, "");
-    else s = s.slice(0, pos) + "." + s.slice(pos + 1);
+function renderLives() {
+  $("lives").textContent = "❤️".repeat(MAX_MISTAKES - mistakes) + "🖤".repeat(mistakes);
+}
+
+function renderBreadcrumb() {
+  const done = current.path.slice(0, levelIdx).map(l => `<b>${esc(l.n)}</b>`);
+  done.push('<span class="next-q">?</span>');
+  $("breadcrumb").innerHTML = done.join('<span class="sep">›</span>');
+}
+
+function renderLevel() {
+  renderLives();
+  renderBreadcrumb();
+  $("level-label").textContent = `Level ${levelIdx + 1} of ${current.path.length}`;
+
+  const lvl = current.path[levelIdx];
+  const opts = sample([lvl.n, ...lvl.w], 4);
+  $("options").innerHTML = "";
+  opts.forEach(name => {
+    const b = document.createElement("button");
+    b.textContent = name;
+    b.onclick = () => pick(b, name);
+    $("options").appendChild(b);
+  });
+}
+
+function pick(btn, name) {
+  const lvl = current.path[levelIdx];
+  if (name === lvl.n) {
+    btn.classList.add("correct");
+    document.querySelectorAll("#options button").forEach(b => b.disabled = true);
+    levelIdx++;
+    if (levelIdx >= current.path.length) {
+      setTimeout(() => finishRound(true), 500);
+    } else {
+      setTimeout(renderLevel, 500);
+    }
+  } else {
+    btn.classList.add("wrong");
+    btn.disabled = true;
+    mistakes++;
+    renderLives();
+    if (mistakes >= MAX_MISTAKES) {
+      document.querySelectorAll("#options button").forEach(b => b.disabled = true);
+      setTimeout(() => finishRound(false), 500);
+    }
   }
-  return parseFloat(s);
 }
 
-function submitGuess() {
-  const guess = parsePrice($("guess").value);
-  if (!isFinite(guess) || guess <= 0) { $("guess").focus(); return; }
-
-  const real = current.sp;
-  const diff = (guess - real) / real;
-  const ok = Math.abs(diff) <= TOLERANCE;
+function finishRound(ok) {
   if (ok) score++;
-  history.push({ round, ok, title: current.st, id: current.id });
+  history.push({ round, ok, title: current.t, id: current.id });
 
-  $("sup-price").textContent = fmt(real);
-  $("sup-price").classList.remove("mystery");
   $("score-label").textContent = `Score: ${score}`;
   $("bar-fill").style.width = (round / totalRounds * 100) + "%";
 
@@ -344,21 +341,20 @@ function submitGuess() {
   fb.classList.remove("hidden", "ok", "bad");
   fb.classList.add(ok ? "ok" : "bad");
 
-  const pct = Math.round(Math.abs(diff) * 100);
-  const dir = diff > 0 ? "above" : "below";
+  const fullPath = current.path.map(l => esc(l.n)).join('<span class="sep"> › </span>');
+  const link = `<a href="${PRODUCT_LINK}${current.id}" target="_blank" rel="noopener">View the product in Joompulse →</a>`;
   if (ok) {
-    $("fb-verdict").textContent = pct <= 5 ? "🎯 Sniper!" : "✅ It counts!";
+    $("fb-verdict").textContent = mistakes === 0 ? "🎯 Flawless!" : "✅ Completed!";
     $("fb-detail").innerHTML =
-      `The real price is <b>${fmt(real)}</b>, your guess was ${fmt(guess)} (${pct}% ${dir}).`;
+      `Full path: <b>${fullPath}</b><br>Lives left: ${"❤️".repeat(MAX_MISTAKES - mistakes)}<br>${link}`;
   } else {
-    $("fb-verdict").textContent = "❌ Missed";
+    $("fb-verdict").textContent = "❌ Out of lives";
     $("fb-detail").innerHTML =
-      `The real price is <b>${fmt(real)}</b>, you said ${fmt(guess)} — ${pct}% ${dir}.<br>` +
-      `<a href="${PRODUCT_LINK}${current.id}" target="_blank" rel="noopener">View the product in Joompulse →</a>`;
+      `The correct path was: <b>${fullPath}</b><br>${link}`;
   }
 
-  $("guess-block").classList.add("hidden");
-  fb.classList.remove("hidden");
+  $("options").innerHTML = "";
+  $("breadcrumb").innerHTML = fullPath;
   $("btn-next").textContent = round >= totalRounds ? "Results →" : "Next →";
   $("btn-next").focus();
 }
@@ -373,7 +369,6 @@ function endGame() {
   $("res-title").textContent = rating.title;
   $("res-desc").textContent = rating.desc;
 
-  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   $("res-rows").innerHTML = history.map(h =>
     `<tr>
       <td class="num">${h.round}</td>
@@ -385,20 +380,19 @@ function endGame() {
   show("screen-result");
 }
 
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 $("btn-start").onclick = startGame;
-$("btn-guess").onclick = submitGuess;
 $("btn-next").onclick = nextRound;
 $("btn-again").onclick = () => show("screen-start");
-$("guess").addEventListener("keydown", e => { if (e.key === "Enter") submitGuess(); });
 
-// image fallback
-["mlb-img", "sup-img"].forEach(id => {
-  $(id).onerror = function () {
-    this.onerror = null;
-    this.src = "data:image/svg+xml," + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260"><rect width="100%" height="100%" fill="#232b42"/><text x="50%" y="50%" fill="#97a0b8" font-size="16" text-anchor="middle" font-family="sans-serif">no photo</text></svg>');
-  };
-});
+$("prod-img").onerror = function () {
+  this.onerror = null;
+  this.src = "data:image/svg+xml," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#232b42"/><text x="50%" y="50%" fill="#97a0b8" font-size="14" text-anchor="middle" font-family="sans-serif">no photo</text></svg>');
+};
 </script>
 </body>
 </html>

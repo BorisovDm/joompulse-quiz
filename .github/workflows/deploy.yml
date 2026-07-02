@@ -17,7 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: mkdir dist && cp index.html dist/
+      - run: |
+          mkdir -p dist/categories
+          cp index.html dist/
+          cp categories/index.html dist/categories/
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
